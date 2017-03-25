@@ -19,18 +19,16 @@ const handler = {
 };
 
 class lowkie {
-
-	/**
-	 * Creates an interface
-	 * @param  {Object} [options={}] A set of properties defined by keys with their allowed types as values. Each property will be required by newly constructed classes from this interface
-	 */
   constructor (options = {}) {
     this.connections = new Map();
     this.db = undefined;
+	events.EventEmitter.call(this);
+
     return new Proxy(this, handler);
   }
   connect(dbname='test.db', options={}) {
-    console.log('calleded connect');
+	this.emit('connecting',{dbname,options});
+//  console.log('calleded connect');
     return new Promise((resolve, reject) => {
       
       try {
@@ -41,8 +39,10 @@ class lowkie {
           // autosaveInterval: 5000, // 5 seconds
           // adapter,
         });
+		this.emit('connected',db,{db,options});
         resolve();
       } catch (e) {
+		this.emit('connectionError',e,{dbname,options});
         reject(e);
       }
     })
