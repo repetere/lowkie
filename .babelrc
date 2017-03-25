@@ -1,0 +1,16 @@
+{
+  "presets": ["react", "es2015"],
+  "plugins": ["transform-runtime",
+  "transform-es2015-modules-commonjs",
+  "react-css-modules",
+  "inline-json-import",
+  "transform-dev",
+  ["module-resolver", {
+      "alias": {
+        "react-native": "./adminclient/src/util/server-side-react-native",
+        "ReactNative": "./adminclient/src/util/server-side-react-native"
+      }
+    }] 
+  ],
+  "ignore": "node_modules/*"
+}
