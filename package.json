@@ -40,7 +40,8 @@
     }
   ],
   "dependencies": {
-    "lokijs": "^1.4.3"
+    "lokijs": "^1.4.3",
+    "pluralize": "^4.0.0"
   },
   "description": "My Custom lowkie / Express Applcation",
   "devDependencies": {
