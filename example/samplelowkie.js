@@ -7,7 +7,8 @@ const lowkie3 = require('../index');
 // console.log(lowkie === lowkie2);
 lowkie.connect(path.join(__dirname, './sampledb.json'))
   .then((db) => { 
-    console.log('connected db', db);
+    // console.log('connected db', db);
+    console.log('connected db');
   })
   .catch(e => {
     console.log('connection error', e);
