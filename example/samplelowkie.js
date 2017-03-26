@@ -5,7 +5,16 @@ const lowkie3 = require('../index');
 
 // console.log( 'lowkie.connection', lowkie.connection );
 // console.log(lowkie === lowkie2);
-lowkie.connect(path.join(__dirname, './sampledb.json'));
+lowkie.connect(path.join(__dirname, './sampledb.json'))
+  .then((db) => { 
+    console.log('connected db', db);
+  })
+  .catch(e => {
+    console.log('connection error', e);
+  });
+lowkie.connection.on('connectionError', (e)=>{
+  console.log('error connecting to the db',e);
+});
 lowkie.connection.on('connecting', (connectdata)=>{
   console.log('now trying to connect to db');
 });
