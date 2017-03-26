@@ -16,7 +16,8 @@ lowkie.connection.once('connected', (connectdata)=>{
   });
   let Kitten = lowkie.model('kitten', kittySchema);
   Kitten.insert({
-    name: 'princess',
+    name: 'princess' + Math.random(),
+    id: new Date().valueOf() + Math.random(),
   })
     .then(newkitty => {
       console.log({ newkitty });
