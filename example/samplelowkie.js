@@ -2,7 +2,11 @@ const path = require('path');
 const lowkie = require('../index');
 const lowkie2 = require('../index');
 const lowkie3 = require('../index');
-
+const randomName = [ 'princess', 'prince', 'king', 'queen', 'pauper', 'jester' ];
+const getName = ()=> {
+  let randomIndex = Math.floor(Math.random() * 6) + 1;
+  return randomName[ randomIndex ];
+}
 // console.log( 'lowkie.connection', lowkie.connection );
 // console.log(lowkie === lowkie2);
 lowkie.connect(path.join(__dirname, './sampledb.json'))
@@ -26,7 +30,7 @@ lowkie.connection.once('connected', (connectdata)=>{
   });
   let Kitten = lowkie.model('kitten', kittySchema);
   Kitten.insert({
-    name: 'princess' + Math.random(),
+    name: getName() + Math.random(),
     id: new Date().valueOf() + Math.random(),
   })
     .then(newkitty => {
@@ -38,6 +42,12 @@ lowkie.connection.once('connected', (connectdata)=>{
   // console.log(lowkie.db);
   let t = setInterval(() => {
     console.log('running process');
+    Kitten.insert({
+      name: getName() + Math.random(),
+      id: new Date().valueOf() + Math.random(),
+    });
+    var results = Kitten.find({ id: { '$gte': 1 } });
+    console.log({results})
   }, 5000);
 });
 
