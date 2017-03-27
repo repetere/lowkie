@@ -55,7 +55,6 @@ module.exports = function (grunt) {
         // coveralls.io is down). Optional, defaults to false.
         force: false,
       },
-
       all: {
         // LCOV coverage file (can be string, glob or array)
         src: 'coverage/*.info',
