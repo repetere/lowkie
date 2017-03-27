@@ -126,6 +126,33 @@ describe('Connect', function () {
           done();
         });
     });
+    it('should throw error on invalid adapter types and emit error', (done) => { 
+      let newLOWKIE = new lowkieClass({});
+      let lowkieConnect = lowkieConnectTest.bind(newLOWKIE);
+      let throwawayfilepath = invalidFILEPATH;
+      // expect(lowkieConnect.bind(lowkieConnect, throwawayfilepath, {}, {
+      //   overwriteInvalidJSON: false,
+      //   adapterType: false,
+      // })).to.throw(Error);
+      lowkieConnect(throwawayfilepath, {}, {
+        overwriteInvalidJSON: false,
+        adapterType:false,
+      })
+        .then(() => { 
+          // console.log('resoved here')
+          // console.log('newLOWKIE.config', newLOWKIE.config);
+          // done();
+        })
+        .catch(e => {
+          expect(e).to.be.instanceof(Error);
+          // done();
+        });
+      
+      newLOWKIE.connection.once('connectionError', (e) => {
+        expect(e).to.be.instanceOf(Error);
+        done();
+      });
+    });
     // it('should emit connection error', (done) => { 
     //   let newLOWKIE = new lowkieClass({});
     //   let lowkieConnect = lowkieConnectTest.bind(newLOWKIE);
