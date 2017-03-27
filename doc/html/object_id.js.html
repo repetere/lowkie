@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Home</title>
+    <title>JSDoc: Source: object_id.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,36 +17,41 @@
 
 <div id="main">
 
-    <h1 class="page-title">Home</h1>
+    <h1 class="page-title">Source: object_id.js</h1>
 
     
 
 
 
     
-
-
-    <h3> </h3>
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
     <section>
-        <article><h1>lowkie</h1><p>ORM for Lokijs</p></article>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+const crypto = require('crypto');
+
+/**
+ * helper class for generating Ids
+ * 
+ * @class ObjectId
+ */
+class ObjectId{
+  /**
+   * generates a unique ID
+   * 
+   * @static
+   * 
+   * @memberOf ObjectId
+   */
+  static createId() {
+    let _id = crypto.createHash('md5').update(`${new Date().valueOf}${Math.random()}`).digest('hex');
+    return _id;
+  }
+  constructor() {
+  }
+}
+module.exports = ObjectId;</code></pre>
+        </article>
     </section>
-
-
 
 
 

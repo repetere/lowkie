@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Home</title>
+    <title>JSDoc: Source: lowkieProxyHandler.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,36 +17,39 @@
 
 <div id="main">
 
-    <h1 class="page-title">Home</h1>
+    <h1 class="page-title">Source: lowkieProxyHandler.js</h1>
 
     
 
 
 
     
-
-
-    <h3> </h3>
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
     <section>
-        <article><h1>lowkie</h1><p>ORM for Lokijs</p></article>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+/**
+ * @function handler
+ * @description this is the proxy handler for lowkie, provides access to native loki methods as well.
+ * 
+ * @returns {object}
+ */
+function proxyHandler() {
+  //bound this;
+  return {
+    get: function (target, name) {
+      // console.log({ name });
+      return target[ name ];
+    },
+  };
+}
+
+module.exports = proxyHandler;
+
+
+</code></pre>
+        </article>
     </section>
-
-
 
 
 
