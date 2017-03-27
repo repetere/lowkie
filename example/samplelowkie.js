@@ -7,9 +7,6 @@ const getName = () => {
   let randomIndex = Math.floor(Math.random() * 6) + 1;
   return randomName[ randomIndex ];
 };
-// console.log('exposed: lowkie.Schema.Types', lowkie.Schema.Types);
-// console.log( 'lowkie.connection', lowkie.connection );
-// console.log(lowkie === lowkie2);
 lowkie.connect(path.join(__dirname, './sampledb.json'))
   .then((db) => { 
     // console.log('connected db', db);
