@@ -88,10 +88,10 @@ module.exports = function (grunt) {
     browserify: {
       dist: {
         files: [ {
-          // expand: true,
+          expand: true,
           // cwd: 'scripts',
           src: [ 'index.js', ],
-          dest: 'dist',
+          dest: './dist',
           rename: function (dest, src) {
             var finallocation = path.join(dest, src);
             finallocation = finallocation.replace('index.js', 'lowkie.js');
@@ -103,7 +103,7 @@ module.exports = function (grunt) {
         options: {
           transform: [
             [ 'babelify', {
-              presets: [ 'es2015', ],
+              presets: [ 'es2015', 'es2016', 'es2017', ],
             }, ],
           ],
         },
@@ -118,10 +118,10 @@ module.exports = function (grunt) {
       },
       all: {
         files: [{
-          // expand: true,
+          expand: true,
           // cwd: 'scripts',
           src: ['dist/lowkie.js',],
-          dest: 'dist',
+          dest: './dist',
           rename: function (dest, src) {
             var finallocation = path.join(dest, src);
             finallocation = finallocation.replace('lowkie.js', 'lowkie.min.js');
@@ -141,5 +141,5 @@ module.exports = function (grunt) {
   }
   grunt.registerTask('doc', 'jsdoc');
   grunt.registerTask('test', 'mocha_istanbul');
-  grunt.registerTask('default', ['lint', 'browserify', 'doc', 'uglify', 'test',]);
+  grunt.registerTask('default', [/*'lint',*/'test', 'browserify', 'doc', 'uglify', ]);
 };
