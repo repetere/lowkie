@@ -6,9 +6,10 @@ const chai = require('chai');
 const fs = require('fs-extra');
 const expect = require('chai').expect;
 const testConnectDBPath = path.join(__dirname, '../mock/connecttestdb.json');
+const removeTestDB = require('../util/removeTestDB');
 let lowkie = require('../../index');
 let lowkieConnectTest = require('../../lib/connect');
-const removeTestDB = require('../util/removeTestDB');
+let lowkieClass = require('../../lib/lowkieClass');
 
 describe('Connect', function () {
   this.timeout(10000);
@@ -46,7 +47,7 @@ describe('Connect', function () {
         done();
       });
     });
-    it('should emit connected event once connected to an existing db filepath', () => { 
+    it('should emit connected event once connected to an existing db filepath', (done) => { 
       let lowkieConnect = lowkieConnectTest.bind(lowkie);
       lowkieConnect(testConnectDBPath);
       lowkie.connection.once('connected', (status) => {
@@ -54,11 +55,12 @@ describe('Connect', function () {
         done();
       });
     });
-    it('should emit connected event once connected to a new db filepath', () => { 
-      let lowkieConnect = lowkieConnectTest.bind(lowkie);
+    it('should emit connected event once connected to a new db filepath', (done) => { 
+      let newLOWKIE = new lowkieClass({});
+      let lowkieConnect = lowkieConnectTest.bind(newLOWKIE);
       let throwawayfilepath = path.join(__dirname, '../mock/connecttestthrowaway.json');
       lowkieConnect(throwawayfilepath);
-      lowkie.connection.once('connected', (status) => {
+      newLOWKIE.connection.once('connected', (status) => {
         expect(status).to.be.an('object');
         removeTestDB(throwawayfilepath);
         done();

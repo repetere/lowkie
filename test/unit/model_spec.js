@@ -3,33 +3,75 @@
 const path = require('path');
 const events = require('events');
 const chai = require('chai');
+const fs = require('fs-extra');
 const expect = require('chai').expect;
+const testSchemaDBPath = path.join(__dirname, '../mock/modeltestdb.json');
+const removeTestDB = require('../util/removeTestDB');
 let lowkie = require('../../index');
-let lowkieSchema = require('../../lib/schema');
-
+let lowkieClass = require('../../lib/lowkieClass');
+let testUserModelScheme = {
+  name: String,
+  email: String,
+  active: Boolean,
+  age: Number,
+  profile: {
+    type: String,
+    default: 'no profile',
+  },
+};
+let testUserModel;
+// let testUserModel;
 
 describe('Model', function () {
-	describe('Represents a singleton module', function () {
-    it('should always reference the same instance of lowkie when required', function () {
-      let lowkie2 = require('../../index');
-			expect(lowkie).to.deep.equal(lowkie2);
-			// expect([1, 2, 3].indexOf(5)).to.equal(-1 );
-			// should.equal(-1, [1, 2, 3].indexOf(0));
+  this.timeout(10000);
+  before('intialize lowkie instance', (done) => {
+    removeTestDB(testSchemaDBPath, false);
+    lowkie.connect(testSchemaDBPath)
+      .then((/*db*/) => { 
+        // console.log('connected modeltestdb');
+        // testUserModel = lowkie.Schema(testUserModelScheme);
+        // testUserModel = lowkie.model('testuser', testUserModel);
+        // console.log({testUserModel})
+        done();
+      })
+      .catch(done);
+  });
+	describe('Creation', function () {
+    it('should throw an error if creating a model before databse is loaded', function () {
+      let newLOWKIE = new lowkieClass({});
+      expect(newLOWKIE.model.bind(newLOWKIE)).to.throw('There has to be an active lowkie connection before creating models, lowkie.connect is asynchronous');
     });
-    it('should be implemented with configurable default settings', () => {
-      expect(Object.keys(lowkie.config).length).to.be.greaterThan(0);
+    it('should throw an error if model name is not a valid string', function (done) {
+      let newLOWKIE = new lowkieClass({});
+      let throwawayfilepath = path.join(__dirname, '../mock/modelthrowaway1.json');
+      newLOWKIE.connect(throwawayfilepath)
+        .then(() => { 
+          expect(newLOWKIE.model.bind(newLOWKIE)).to.throw('model name must be a valid string');
+          removeTestDB(throwawayfilepath);
+          done()
+        })
+        .catch(done);
     });
-    it('should export schema types', () => {
-      expect(lowkie.Schema.Types).to.be.an('object');
-      expect(lowkie.Schema.Types).to.have.property('String');
-      expect(lowkie.Schema.Types.String).to.deep.equal(String);
-      expect(lowkie.Schema.Types).to.have.property('ObjectId');
+    it('should throw an error if schema isnt an instance of lowkie schema', function (done) {
+      let newLOWKIE = new lowkieClass({});
+      let throwawayfilepath = path.join(__dirname, '../mock/modelthrowaway2.json');
+      let model = 'testmodel';
+      newLOWKIE.connect(throwawayfilepath)
+        .then(() => { 
+          expect(newLOWKIE.model.bind(newLOWKIE, model, { name:String,description:String, })).to.throw(`${model} must be an instance of a lowkieSchema`);
+          removeTestDB(throwawayfilepath);
+          done();
+        })
+        .catch(done);
     });
-    it('should have connection that emit events', () => {
-      expect(lowkie.connection).to.be.an.instanceof(events.EventEmitter);
+    it('should register models globally', () => {
+      let goodModelSchema = lowkie.Schema(testUserModelScheme);
+      lowkie.model('goodModel', goodModelSchema);
+      console.log(lowkie.models);
+      expect(Object.keys(lowkie.models)).to.have.length.above(0);
     });
-    // it('should export instance of lowkie class proxy', () => {
-    //   expect(lowkie).to.be.an.instanceof(Proxy);
-    // });
+  });
+  after('remove test schema db', () => {
+    removeTestDB(testSchemaDBPath, true);
   });
 });
