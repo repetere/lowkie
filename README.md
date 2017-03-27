@@ -1,8 +1,11 @@
-# lowkie
+# Lowkie
 [![Build Status](https://travis-ci.org/typesettin/lowkie.svg?branch=master)](https://travis-ci.org/typesettin/lowkie) [![NPM version](https://badge.fury.io/js/lowkie.svg)](http://badge.fury.io/js/lowkie) [![Coverage Status](https://coveralls.io/repos/github/typesettin/lowkie/badge.svg?branch=master)](https://coveralls.io/github/typesettin/lowkie?branch=master)  [![Join the chat at https://gitter.im/typesettin/lowkie](https://badges.gitter.im/typesettin/lowkie.svg)](https://gitter.im/typesettin/lowkie?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ### Description
 Lowkie is a lokijs object modeling tool designed to work in an asynchronous environment.
+
+<p style="text-align:center;"><img src="https://raw.githubusercontent.com/typesettin/lowkie/master/doc/lowkie.png" alt="Promisie Logo" width="300px" height="auto" style="margin:auto; text-align:center;"></p>
+
 
 ### Installation
 ```sh
@@ -116,7 +119,7 @@ $ npm i -g grunt-cli jsdoc-to-markdown
 For generating documentation
 ```sh
 $ grunt doc
-$ jsdoc2md lib/**/*.js utility/**/*.js index.js > doc/api.md
+$ jsdoc2md lib/**/*.js index.js > doc/api.md
 ```
 ### Notes
 * Check out [https://github.com/typesettin/lowkie](https://github.com/typesettin/lowkie) for the full Lowkie Documentation
