@@ -42,4 +42,4 @@ git:
   submodules: false  
 
 script: 
-  - npm set progress=false && grunt test && grunt coveralls
+  - npm set progress=false && grunt test
