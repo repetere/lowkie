@@ -4,32 +4,35 @@ const path = require('path');
 const events = require('events');
 const chai = require('chai');
 const expect = require('chai').expect;
-let lowkie = require('../../index');
-let lowkieSchema = require('../../lib/schema');
+// let lowkie = require('../../index');
+let lowkieObjectId = require('../../lib/object_id');
 
 
-describe('lowkie', function () {
-	describe('Represents a singleton module', function () {
-    it('should always reference the same instance of lowkie when required', function () {
-      let lowkie2 = require('../../index');
-			expect(lowkie).to.deep.equal(lowkie2);
-			// expect([1, 2, 3].indexOf(5)).to.equal(-1 );
-			// should.equal(-1, [1, 2, 3].indexOf(0));
+describe('ObjectId', function () {
+	describe('Represents a class for generating ObjectId', function () {
+    it('should export a new class', function () {
+      let lowkieObjectIdInstance = new lowkieObjectId();
+      expect(lowkieObjectIdInstance).to.be.instanceof(lowkieObjectId);
     });
-    it('should be implemented with configurable default settings', () => {
-      expect(Object.keys(lowkie.config).length).to.be.greaterThan(0);
+    it('should generate unique ids', () => {
+      expect(lowkieObjectId.createId()).to.not.equal(lowkieObjectId.createId());
     });
-    it('should export schema types', () => {
-      expect(lowkie.Schema.Types).to.be.an('object');
-      expect(lowkie.Schema.Types).to.have.property('String');
-      expect(lowkie.Schema.Types.String).to.deep.equal(String);
-      expect(lowkie.Schema.Types).to.have.property('ObjectId');
+    it('should have a static method for generating ids', () => {
+      // let lowkieObjectIdInstance = new lowkieObjectId();
+      expect(lowkieObjectId.createId).to.be.a('function');
+      expect(lowkieObjectId.createId()).to.be.a('string');
     });
-    it('should have connection that emit events', () => {
-      expect(lowkie.connection).to.be.an.instanceof(events.EventEmitter);
-    });
-    // it('should export instance of lowkie class proxy', () => {
-    //   expect(lowkie).to.be.an.instanceof(Proxy);
+    // it('should export schema types', () => {
+    //   expect(lowkie.Schema.Types).to.be.an('object');
+    //   expect(lowkie.Schema.Types).to.have.property('String');
+    //   expect(lowkie.Schema.Types.String).to.deep.equal(String);
+    //   expect(lowkie.Schema.Types).to.have.property('ObjectId');
     // });
+    // it('should have connection that emit events', () => {
+    //   expect(lowkie.connection).to.be.an.instanceof(events.EventEmitter);
+    // });
+    // // it('should export instance of lowkie class proxy', () => {
+    // //   expect(lowkie).to.be.an.instanceof(Proxy);
+    // // });
   });
 });

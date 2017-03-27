@@ -28,8 +28,17 @@ describe('lowkie', function () {
     it('should have connection that emit events', () => {
       expect(lowkie.connection).to.be.an.instanceof(events.EventEmitter);
     });
-    // it('should export instance of lowkie class proxy', () => {
-    //   expect(lowkie).to.be.an.instanceof(Proxy);
-    // });
+    it('should expose a method for creating schemas', () => {
+      let testUserSchema = {
+        name: String,
+        email: String,
+        profile: {
+          type: String,
+          default: 'no profile',
+        },
+      };
+      expect(lowkie.Schema).to.be.an.a('function');
+      expect(lowkie.Schema(testUserSchema)).to.be.an.an('object');
+    });
   });
 });
