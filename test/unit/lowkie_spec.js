@@ -6,15 +6,15 @@ const chai = require('chai');
 const expect = require('chai').expect;
 let lowkie = require('../../index');
 let lowkieSchema = require('../../lib/schema');
-
+let lowkieClass = require('../../lib/lowkieClass');
 
 describe('lowkie', function () {
 	describe('Represents a singleton module', function () {
     it('should always reference the same instance of lowkie when required', function () {
       let lowkie2 = require('../../index');
-			expect(lowkie).to.deep.equal(lowkie2);
-			// expect([1, 2, 3].indexOf(5)).to.equal(-1 );
-			// should.equal(-1, [1, 2, 3].indexOf(0));
+      expect(lowkie)
+        .to.deep.equal(lowkie2)
+        .and.to.be.an.instanceof(lowkieClass);
     });
     it('should be implemented with configurable default settings', () => {
       expect(Object.keys(lowkie.config).length).to.be.greaterThan(0);

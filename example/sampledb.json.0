@@ -1,2 +1,4 @@
 {"name":"king0.2726792766487611","entitytype":"kat","_id":"fbd8080a9272ecaa15d1bb6d0f4b3314","meta":{"revision":0,"created":1490576236063,"version":0},"$loki":201}
 {"name":"prince0.8735373934837287","entitytype":"kat","description":10983021,"_id":"d48e3dde06a8e758b6afa6bf2d103cb2","meta":{"revision":0,"created":1490576507732,"version":0},"$loki":202}
+{"name":"queen0.8482004465847226","entitytype":"kat","description":10983021,"_id":"80a605aae9ecb2599b176f1e92dc64e8","meta":{"revision":0,"created":1490632925062,"version":0},"$loki":208}
+{"name":"jester0.26873625459623796","entitytype":"kat","_id":"fdf9c37302d3a58538bea96d72584632","meta":{"revision":0,"created":1490632930071,"version":0},"$loki":209}

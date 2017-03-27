@@ -3,33 +3,145 @@
 const path = require('path');
 const events = require('events');
 const chai = require('chai');
+const fs = require('fs-extra');
 const expect = require('chai').expect;
+const testSchemaDBPath = path.join(__dirname, '../mock/schematestdb.json');
 let lowkie = require('../../index');
 let lowkieSchema = require('../../lib/schema');
+let testUserSchemaScheme = {
+  name: String,
+  email: String,
+  active: Boolean,
+  age: Number,
+  profile: {
+    type: String,
+    default: 'no profile',
+  },
+};
+let testUserSchema;
+let testUserModel;
 
-
-describe('lowkie', function () {
-	describe('Represents a singleton module', function () {
-    it('should always reference the same instance of lowkie when required', function () {
-      let lowkie2 = require('../../index');
-			expect(lowkie).to.deep.equal(lowkie2);
-			// expect([1, 2, 3].indexOf(5)).to.equal(-1 );
-			// should.equal(-1, [1, 2, 3].indexOf(0));
+describe('Schema', function () {
+  this.timeout(10000);
+  before('intialize lowkie instances', (done) => {
+    fs.removeSync(testSchemaDBPath);
+    lowkie.connect(testSchemaDBPath)
+      .then((/*db*/) => { 
+        // console.log('connected schematestdb');
+        testUserSchema = lowkie.Schema(testUserSchemaScheme);
+        testUserModel = lowkie.model('testuser', testUserSchema);
+        // console.log({testUserSchema})
+        done();
+      })
+      .catch(done);
+  });
+	describe('Lowkie Schema', function () {
+    it('should be an instance of a lowkieSchema', function () {
+      expect(testUserSchema).to.be.an.instanceof(lowkieSchema)
+        .and.to.be.an('object');
+      expect(testUserSchema).and.to.have.property('createDoc');
+      expect(testUserSchema).and.to.have.property('insert');
     });
-    it('should be implemented with configurable default settings', () => {
-      expect(Object.keys(lowkie.config).length).to.be.greaterThan(0);
+    it('should have a static property that exports Schema Types', () => {
+      expect(lowkieSchema.Types).to.be.an('object');
+      expect(lowkieSchema.Types.String).to.deep.equal(String);
     });
-    it('should export schema types', () => {
-      expect(lowkie.Schema.Types).to.be.an('object');
-      expect(lowkie.Schema.Types).to.have.property('String');
-      expect(lowkie.Schema.Types.String).to.deep.equal(String);
-      expect(lowkie.Schema.Types).to.have.property('ObjectId');
+  });
+  describe('#LowkieSchema', () => {
+    it('should include _id in valid schema properties', () => {
+      expect(Object.keys(testUserSchemaScheme).concat([ '_id', ])).to.eql(testUserSchema.validNames);
     });
-    it('should have connection that emit events', () => {
-      expect(lowkie.connection).to.be.an.instanceof(events.EventEmitter);
+  });
+  describe('#createDoc', () => {
+    it('should always generate an Id', () => {
+      expect(testUserSchema.createDoc({})._id).to.be.an('string');
+      expect(Object.keys(testUserSchema.createDoc({})).length).to.eql(1);
     });
-    // it('should export instance of lowkie class proxy', () => {
-    //   expect(lowkie).to.be.an.instanceof(Proxy);
-    // });
+    it('should allow for custom Ids', () => {
+      let customId = '1234';
+      expect(testUserSchema.createDoc({ _id:customId, })._id).to.eql(customId);
+    });
+    it('should ignore invalid schema props', () => {
+      let newUser = testUserSchema.createDoc({
+        name: 'testuser',
+        email: 'user@domain.tld',
+        profile: 'mocha test',
+        active: true,
+        age: 18,
+        invalidprop: 'whatever',
+      });
+      expect(newUser).to.be.an('object');
+      expect(newUser.invalidprop).to.not.exist;
+      expect(Object.keys(newUser).length).to.eql(6);
+      expect(newUser._id).to.be.a('string');
+    });
+    it('should convert values to proper type', () => {
+      let newUser = testUserSchema.createDoc({
+        name: 'testuser',
+        email: 'user@domain.tld',
+        profile: 'mocha test',
+        active: "true",
+        age: "18",
+        invalidprop: 'whatever',
+      });
+      expect(newUser.active).to.be.a('boolean');
+      expect(newUser.age).to.be.a('number');
+    });
+  });
+  describe('#insert', () => {
+    it('should return a promise', () => {
+      expect(testUserSchema.insert()).to.be.an.instanceof(Promise);
+    });
+    it('should insert documents', (done) => {
+      testUserSchema.insert({
+        target: testUserModel.insert,
+        thisArg: lowkie,
+        argumentsList: {
+          name: 'testuser',
+          email: 'user@domain.tld',
+          profile: 'mocha test',
+          active: true,
+          age: 18,
+          invalidprop: 'whatever',
+        },
+      })
+        .then(newdoc => {
+          expect(newdoc).to.be.an('object');
+          done();
+        })
+        .catch(done);
+    });
+    it('should insert multiple documents', (done) => {
+      testUserSchema.insert({
+        target: testUserModel.insert,
+        thisArg: lowkie,
+        argumentsList: [{
+          name: 'testuser',
+          email: 'user@domain.tld',
+          profile: 'mocha test',
+          active: true,
+          age: 18,
+          invalidprop: 'whatever',
+        },
+        {
+          name: 'testuser2',
+          email: 'user2domain.tld',
+          profile: 'mocha test2',
+          active: false,
+          age: 19,
+          invalidprop: 'whatever',
+        }],
+      })
+        .then(newdocs => {
+          // console.log({newdocs})
+          expect(newdocs).to.be.an('array');
+          done();
+        })
+        .catch(done);
+    });
+  });
+  after('remove test schema db', () => {
+    fs.removeSync(testSchemaDBPath);
+    fs.removeSync(testSchemaDBPath + '.0');
   });
 });
