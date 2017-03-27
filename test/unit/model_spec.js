@@ -67,7 +67,7 @@ describe('Model', function () {
     it('should register models globally', () => {
       let goodModelSchema = lowkie.Schema(testUserModelScheme);
       lowkie.model('goodModel', goodModelSchema);
-      console.log(lowkie.models);
+      // console.log(lowkie.models);
       expect(Object.keys(lowkie.models)).to.have.length.above(0);
     });
   });

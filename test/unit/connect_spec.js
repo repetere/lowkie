@@ -7,6 +7,8 @@ const fs = require('fs-extra');
 const expect = require('chai').expect;
 const testConnectDBPath = path.join(__dirname, '../mock/connecttestdb.json');
 const removeTestDB = require('../util/removeTestDB');
+const invalidJSONPATH = path.join(__dirname, '../mock/invalid.db.json');
+const invalidFILEPATH = path.join(__dirname, '../mock/invalid.db.jsonfile');
 let lowkie = require('../../index');
 let lowkieConnectTest = require('../../lib/connect');
 let lowkieClass = require('../../lib/lowkieClass');
@@ -55,6 +57,17 @@ describe('Connect', function () {
         done();
       });
     });
+    it('should connect and load an existing db filepath', (done) => { 
+      let newLOWKIE = new lowkieClass({});
+      let lowkieConnect = lowkieConnectTest.bind(newLOWKIE);
+      lowkieConnect(testConnectDBPath)
+        .then((db) => {
+          expect(db).to.be.an('object');
+          expect(db).to.eql(newLOWKIE.db);
+          done();
+         })
+        .catch(done);
+    });
     it('should emit connected event once connected to a new db filepath', (done) => { 
       let newLOWKIE = new lowkieClass({});
       let lowkieConnect = lowkieConnectTest.bind(newLOWKIE);
@@ -66,8 +79,89 @@ describe('Connect', function () {
         done();
       });
     });
+    it('should allow for custom lowkie configurations', (done) => { 
+      let newLOWKIE = new lowkieClass({});
+      let lowkieConnect = lowkieConnectTest.bind(newLOWKIE);
+      let throwawayfilepath = path.join(__dirname, '../mock/connecttestthrowaway2.json');
+      lowkieConnect(throwawayfilepath, {}, { adapterType: 'default', })
+        .then(() => { 
+          // console.log('newLOWKIE.config', newLOWKIE.config);
+          expect(newLOWKIE.config.adapterType).to.eql('default');
+          removeTestDB(throwawayfilepath);
+          done();
+        })
+        .catch(done);
+    });
+    it('should allow handle invalid database json', (done) => { 
+      let newLOWKIE = new lowkieClass({});
+      let lowkieConnect = lowkieConnectTest.bind(newLOWKIE);
+      let throwawayfilepath = invalidJSONPATH;
+      lowkieConnect(throwawayfilepath, {}, { adapterType: 'default', }, {
+        overwriteInvalidJSON:false,
+      })
+        .then(() => { 
+          // console.log('newLOWKIE.config', newLOWKIE.config);
+          expect(newLOWKIE.config.adapterType).to.eql('default');
+          done();
+        })
+        .catch(e => {
+          console.log(e);
+          done();
+        });
+    });
+    it('should throw error handling invalid database file', (done) => { 
+      let newLOWKIE = new lowkieClass({});
+      let lowkieConnect = lowkieConnectTest.bind(newLOWKIE);
+      let throwawayfilepath = invalidFILEPATH;
+      lowkieConnect(throwawayfilepath, {}, {
+        overwriteInvalidJSON:false,
+      })
+        .then(() => { 
+          console.log('resoved here')
+          // console.log('newLOWKIE.config', newLOWKIE.config);
+          done();
+        })
+        .catch(e => {
+          expect(e).to.be.instanceof(Error);
+          done();
+        });
+    });
+    // it('should emit connection error', (done) => { 
+    //   let newLOWKIE = new lowkieClass({});
+    //   let lowkieConnect = lowkieConnectTest.bind(newLOWKIE);
+    //   let throwawayfilepath = invalidFILEPATH;
+    //   let nameCounter = 0;
+    //   let configProxy = new Proxy({
+    //     overwriteInvalidJSON: false,
+    //     adapterType: 'default',
+    //   }, {
+    //     get: function (target, name) {
+    //       if (name === 'adapterType') {
+    //         nameCounter++;
+    //       } 
+    //       if (nameCounter > 0) {
+    //         // throw new Error('testing error handling');
+    //         console.log({ target, name, nameCounter });
+    //         return new Error('testing error handling');  
+    //       } else {
+    //         console.log({ target, name, nameCounter });
+    //         return target[ name ];
+    //       }
+    //     },
+    //   });
+    //   lowkieConnect('/private', {}, configProxy)
+    //     .catch((e) => {
+    //       console.log(e);//do nothing, wait for event
+    //       // done();
+    //     });
+    //   newLOWKIE.connection.once('connectionError', (e) => {
+    //     expect(e).to.be.instanceOf(Error);
+    //     done();
+    //   });
+    // });
   });
   after('remove test schema db', () => {
     removeTestDB(testConnectDBPath, true);
+    fs.outputJsonSync(invalidJSONPATH, {});
   });
 });
