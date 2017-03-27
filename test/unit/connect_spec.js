@@ -3,33 +3,69 @@
 const path = require('path');
 const events = require('events');
 const chai = require('chai');
+const fs = require('fs-extra');
 const expect = require('chai').expect;
+const testConnectDBPath = path.join(__dirname, '../mock/connecttestdb.json');
 let lowkie = require('../../index');
-let lowkieSchema = require('../../lib/schema');
+let lowkieConnectTest = require('../../lib/connect');
+const removeTestDB = require('../util/removeTestDB');
 
-
-describe('lowkie', function () {
-	describe('Represents a singleton module', function () {
-    it('should always reference the same instance of lowkie when required', function () {
-      let lowkie2 = require('../../index');
-			expect(lowkie).to.deep.equal(lowkie2);
-			// expect([1, 2, 3].indexOf(5)).to.equal(-1 );
-			// should.equal(-1, [1, 2, 3].indexOf(0));
+describe('Connect', function () {
+  this.timeout(10000);
+  before('intialize lowkie instances', (done) => {
+    removeTestDB(testConnectDBPath, false);
+  //   lowkie.connect(testConnectDBPath)
+  //     .then((/*db*/) => { 
+  //       // console.log('connected connecttestdb');
+  //       testUserSchema = lowkie.Schema(testUserSchemaScheme);
+  //       testUserModel = lowkie.model('testuser', testUserSchema);
+  //       // console.log({testUserSchema})
+        done();
+  //     })
+  //     .catch(done);
+  });
+	describe('#connect', function () {
+    it('should be a bound method to Lowkie singleton', () => { 
+      let lowkieConnect = lowkieConnectTest.bind(lowkie);
+      expect(lowkieConnect.db).to.eql(lowkie.db);
     });
-    it('should be implemented with configurable default settings', () => {
-      expect(Object.keys(lowkie.config).length).to.be.greaterThan(0);
+    it('should return a promise', () => { 
+      let lowkieConnect = lowkieConnectTest.bind(lowkie);
+      expect(lowkieConnect()).to.be.an.instanceof(Promise);
     });
-    it('should export schema types', () => {
-      expect(lowkie.Schema.Types).to.be.an('object');
-      expect(lowkie.Schema.Types).to.have.property('String');
-      expect(lowkie.Schema.Types.String).to.deep.equal(String);
-      expect(lowkie.Schema.Types).to.have.property('ObjectId');
+    it('should set a default connection db', () => { 
+      let lowkieConnect = lowkieConnectTest.bind(lowkie);
+      lowkieConnect(testConnectDBPath);
+      expect(lowkie.connections.has('default')).to.be.true;
     });
-    it('should have connection that emit events', () => {
-      expect(lowkie.connection).to.be.an.instanceof(events.EventEmitter);
+    it('should emit connecting event', (done) => {
+      let lowkieConnect = lowkieConnectTest.bind(lowkie);
+      lowkieConnect(testConnectDBPath);
+      lowkie.connection.once('connecting', (status) => {
+        expect(status).to.be.an('object');
+        done();
+      });
     });
-    // it('should export instance of lowkie class proxy', () => {
-    //   expect(lowkie).to.be.an.instanceof(Proxy);
-    // });
+    it('should emit connected event once connected to an existing db filepath', () => { 
+      let lowkieConnect = lowkieConnectTest.bind(lowkie);
+      lowkieConnect(testConnectDBPath);
+      lowkie.connection.once('connected', (status) => {
+        expect(status).to.be.an('object');
+        done();
+      });
+    });
+    it('should emit connected event once connected to a new db filepath', () => { 
+      let lowkieConnect = lowkieConnectTest.bind(lowkie);
+      let throwawayfilepath = path.join(__dirname, '../mock/connecttestthrowaway.json');
+      lowkieConnect(throwawayfilepath);
+      lowkie.connection.once('connected', (status) => {
+        expect(status).to.be.an('object');
+        removeTestDB(throwawayfilepath);
+        done();
+      });
+    });
+  });
+  after('remove test schema db', () => {
+    removeTestDB(testConnectDBPath, true);
   });
 });

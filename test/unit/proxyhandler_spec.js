@@ -4,32 +4,23 @@ const path = require('path');
 const events = require('events');
 const chai = require('chai');
 const expect = require('chai').expect;
-let lowkie = require('../../index');
-let lowkieSchema = require('../../lib/schema');
+const sinon = require('sinon');
+let lowkieProxyHandler = require('../../lib/lowkieProxyHandler');
 
-
-describe('lowkie', function () {
-	describe('Represents a singleton module', function () {
-    it('should always reference the same instance of lowkie when required', function () {
-      let lowkie2 = require('../../index');
-			expect(lowkie).to.deep.equal(lowkie2);
-			// expect([1, 2, 3].indexOf(5)).to.equal(-1 );
-			// should.equal(-1, [1, 2, 3].indexOf(0));
-    });
-    it('should be implemented with configurable default settings', () => {
-      expect(Object.keys(lowkie.config).length).to.be.greaterThan(0);
-    });
-    it('should export schema types', () => {
-      expect(lowkie.Schema.Types).to.be.an('object');
-      expect(lowkie.Schema.Types).to.have.property('String');
-      expect(lowkie.Schema.Types.String).to.deep.equal(String);
-      expect(lowkie.Schema.Types).to.have.property('ObjectId');
-    });
-    it('should have connection that emit events', () => {
-      expect(lowkie.connection).to.be.an.instanceof(events.EventEmitter);
-    });
-    // it('should export instance of lowkie class proxy', () => {
-    //   expect(lowkie).to.be.an.instanceof(Proxy);
-    // });
+describe('ProxyHandler', function () {
+  it('should be a proxy handler', () => {
+    expect(lowkieProxyHandler).to.be.a('function');    
+  });
+  it('should return a proxy handler object', () => {
+    expect(lowkieProxyHandler()).to.be.a('object');
+  });
+  it('should trap get property access', () => {
+    let spy = sinon.spy();
+    let testProxy = new Proxy(spy, lowkieProxyHandler);
+    testProxy.someprop = '1234';
+    testProxy.someprop = testProxy.someprop.toString();
+    expect(lowkieProxyHandler().get).to.be.a('function');
+    expect(testProxy.someprop).to.eql(spy.someprop);
+    expect(lowkieProxyHandler().get(spy, 'someprop')).to.eql(spy.someprop);
   });
 });

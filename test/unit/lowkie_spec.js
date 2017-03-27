@@ -8,7 +8,7 @@ let lowkie = require('../../index');
 let lowkieSchema = require('../../lib/schema');
 let lowkieClass = require('../../lib/lowkieClass');
 
-describe('lowkie', function () {
+describe('Lowkie', function () {
 	describe('Represents a singleton module', function () {
     it('should always reference the same instance of lowkie when required', function () {
       let lowkie2 = require('../../index');

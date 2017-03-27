@@ -8,6 +8,7 @@ const expect = require('chai').expect;
 const testSchemaDBPath = path.join(__dirname, '../mock/schematestdb.json');
 let lowkie = require('../../index');
 let lowkieSchema = require('../../lib/schema');
+const removeTestDB = require('../util/removeTestDB');
 let testUserSchemaScheme = {
   name: String,
   email: String,
@@ -24,7 +25,7 @@ let testUserModel;
 describe('Schema', function () {
   this.timeout(10000);
   before('intialize lowkie instances', (done) => {
-    fs.removeSync(testSchemaDBPath);
+    removeTestDB(testSchemaDBPath, false);
     lowkie.connect(testSchemaDBPath)
       .then((/*db*/) => { 
         // console.log('connected schematestdb');
@@ -141,7 +142,6 @@ describe('Schema', function () {
     });
   });
   after('remove test schema db', () => {
-    fs.removeSync(testSchemaDBPath);
-    fs.removeSync(testSchemaDBPath + '.0');
+    removeTestDB(testSchemaDBPath, true);
   });
 });
