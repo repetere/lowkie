@@ -132,7 +132,7 @@ $ grunt test
 ### Contributing
 fork and create a pull request!
 
-[![Loki Party](https://raw.githubusercontent.com/typesettin/lowkie/master/doc/img/loki-party.gif)]
+![Loki Party](https://raw.githubusercontent.com/typesettin/lowkie/master/doc/img/loki-party.gif)
 
 License
 ----
