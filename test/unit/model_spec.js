@@ -3,6 +3,7 @@
 const path = require('path');
 const events = require('events');
 const chai = require('chai');
+const sinon = require('sinon');
 const fs = require('fs-extra');
 const expect = require('chai').expect;
 const testSchemaDBPath = path.join(__dirname, '../mock/modeltestdb.json');
@@ -20,7 +21,8 @@ let testUserModelScheme = {
   },
 };
 let testUserModel;
-// let testUserModel;
+let goodModelSchema;
+let goodModel;
 
 describe('Model', function () {
   this.timeout(10000);
@@ -38,8 +40,13 @@ describe('Model', function () {
   });
 	describe('Creation', function () {
     it('should throw an error if creating a model before databse is loaded', function () {
+      let spy = sinon.spy();
+      // let originalConsoleError = console.error;
       let newLOWKIE = new lowkieClass({});
+      newLOWKIE.debug = true;
+      console.error = spy;
       expect(newLOWKIE.model.bind(newLOWKIE)).to.throw('There has to be an active lowkie connection before creating models, lowkie.connect is asynchronous');
+      expect(spy).to.be.been.called;
     });
     it('should throw an error if model name is not a valid string', function (done) {
       let newLOWKIE = new lowkieClass({});
@@ -65,10 +72,17 @@ describe('Model', function () {
         .catch(done);
     });
     it('should register models globally', () => {
-      let goodModelSchema = lowkie.Schema(testUserModelScheme);
-      lowkie.model('goodModel', goodModelSchema);
+      goodModelSchema = lowkie.Schema(testUserModelScheme);
+      goodModel = lowkie.model('goodModel', goodModelSchema);
       // console.log(lowkie.models);
       expect(Object.keys(lowkie.models)).to.have.length.above(0);
+    });
+    it('should use existing schema if already exists', () => {
+      let newGoodModelSchema = lowkie.Schema(testUserModelScheme);
+      let newGoodModel = lowkie.model('goodModel', newGoodModelSchema);
+      // console.log(lowkie.models);
+      expect(Object.keys(lowkie.models)).to.have.lengthOf(1);
+      expect(goodModel).to.eql(newGoodModel);
     });
   });
   after('remove test schema db', () => {
