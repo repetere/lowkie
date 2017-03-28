@@ -60,13 +60,19 @@ describe('Connect', function () {
     it('should connect and load an existing db filepath', (done) => { 
       let newLOWKIE = new lowkieClass({});
       let lowkieConnect = lowkieConnectTest.bind(newLOWKIE);
-      lowkieConnect(testConnectDBPath)
+      let existingDB = path.join(__dirname, '../mock/sampledb.json');
+
+      lowkieConnect(existingDB)
         .then((db) => {
           expect(db).to.be.an('object');
           expect(db).to.eql(newLOWKIE.db);
-          done();
+          // done();
          })
         .catch(done);
+      newLOWKIE.connection.once('connected', (status) => {
+        expect(status).to.be.an('object');
+        done();
+      });
     });
     it('should emit connected event once connected to a new db filepath', (done) => { 
       let newLOWKIE = new lowkieClass({});

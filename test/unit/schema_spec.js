@@ -14,6 +14,7 @@ let testUserSchemaScheme = {
   email: String,
   active: Boolean,
   age: Number,
+  location: Object,
   profile: {
     type: String,
     default: 'no profile',
@@ -101,7 +102,11 @@ describe('Schema', function () {
           name: 'testuser',
           email: 'user@domain.tld',
           profile: 'mocha test',
-          active: true,
+          location: {
+            lat: 30,
+            lng:-15,
+          },
+          active: false,
           age: 18,
           invalidprop: 'whatever',
         },
