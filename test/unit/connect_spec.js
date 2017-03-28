@@ -1,9 +1,10 @@
 'use strict';
 /*jshint expr: true*/
 const path = require('path');
-const events = require('events');
-const chai = require('chai');
 const fs = require('fs-extra');
+const events = require('events');
+const sinon = require('sinon');
+const chai = require('chai');
 const expect = require('chai').expect;
 const testConnectDBPath = path.join(__dirname, '../mock/connecttestdb.json');
 const removeTestDB = require('../util/removeTestDB');
@@ -67,7 +68,7 @@ describe('Connect', function () {
           expect(db).to.be.an('object');
           expect(db).to.eql(newLOWKIE.db);
           // done();
-         })
+        })
         .catch(done);
       newLOWKIE.connection.once('connected', (status) => {
         expect(status).to.be.an('object');

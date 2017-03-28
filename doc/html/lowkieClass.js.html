@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: object_id.js</title>
+    <title>JSDoc: Source: lowkieClass.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: object_id.js</h1>
+    <h1 class="page-title">Source: lowkieClass.js</h1>
 
     
 
@@ -27,29 +27,54 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>'use strict';
-const crypto = require('crypto');
-
+const events = require('events');
+const lowkieSchema = require('./schema');
+const lowkieModel = require('./model');
+const lowkieConnect = require('./connect');
+const lowkieProxyHandler = require('./lowkieProxyHandler');
 /**
- * helper class for generating Ids
+ * lowkie ORM singleton class
  * 
- * @class ObjectId
+ * @class lowkie
  */
-class ObjectId{
+class lowkie {
   /**
-   * generates a unique ID
+   * Creates an instance of lowkie.
+   * @param {any} [options={}] 
    * 
-   * @static
-   * 
-   * @memberOf ObjectId
+   * @memberOf lowkie
    */
-  static createId() {
-    let _id = crypto.createHash('md5').update(`${new Date().valueOf}${Math.random()}`).digest('hex');
-    return _id;
+  constructor(options = {}) {
+    this.config = Object.assign({
+      adapterType: 'file',
+      debug: false,
+      strictSchemas: true,
+      overwriteInvalidJSON:true,
+    }, options);
+    this.connections = new Map();
+    this.db = undefined;
+    this.models = {};
+    this.connection = new events.EventEmitter();
+    this.model = lowkieModel.bind(this);
+    this.connect = lowkieConnect.bind(this);
+    this.Schema.Types = lowkieSchema.Types;
+    return new Proxy(this, lowkieProxyHandler.call(this));
   }
-  constructor() {
+  /**
+   * creates lowkie schema, also includes helpers for document validations
+   * 
+   * @param {object} scheme 
+   * @returns instance of lowkieSchema
+   * 
+   * @memberOf lowkie
+   */
+  Schema(scheme) {
+    return new lowkieSchema(scheme, this);
   }
 }
-module.exports = ObjectId;</code></pre>
+
+module.exports = lowkie;
+</code></pre>
         </article>
     </section>
 
