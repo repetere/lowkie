@@ -72,6 +72,8 @@ describe('Schema', function () {
         age: 18,
         invalidprop: 'whatever',
       });
+      console.log(testUserSchema.validNames);
+      console.log(newUser);
       expect(newUser).to.be.an('object');
       expect(newUser.invalidprop).to.not.exist;
       expect(Object.keys(newUser).length).to.eql(6);
