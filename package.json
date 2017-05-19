@@ -1,10 +1,9 @@
 {
   "name": "lowkie",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "license": "MIT",
   "main": "index.js",
-  "maintainers": [
-    {
+  "maintainers": [{
       "name": "janbialostok",
       "email": "janbialostok@gmail.com"
     },
@@ -32,13 +31,11 @@
       ]
     }
   },
-  "contributors": [
-    {
-      "name": "Jan Bialostok",
-      "email": "janbialostok@gmail.com",
-      "url": "https://github.com/janbialostok"
-    }
-  ],
+  "contributors": [{
+    "name": "Jan Bialostok",
+    "email": "janbialostok@gmail.com",
+    "url": "https://github.com/janbialostok"
+  }],
   "dependencies": {
     "babel-polyfill": "^6.23.0",
     "flat": "^2.0.1",
