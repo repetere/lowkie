@@ -57,7 +57,7 @@ describe('Schema', function () {
   describe('#createDoc', () => {
     it('should always generate an Id', () => {
       expect(testUserSchema.createDoc({})._id).to.be.an('string');
-      expect(Object.keys(testUserSchema.createDoc({})).length).to.eql(1);
+      expect(Object.keys(testUserSchema.createDoc({})).length).to.eql(2);
     });
     it('should allow for custom Ids', () => {
       let customId = '1234';
@@ -72,8 +72,6 @@ describe('Schema', function () {
         age: 18,
         invalidprop: 'whatever',
       });
-      console.log(testUserSchema.validNames);
-      console.log(newUser);
       expect(newUser).to.be.an('object');
       expect(newUser.invalidprop).to.not.exist;
       expect(Object.keys(newUser).length).to.eql(6);
@@ -91,6 +89,16 @@ describe('Schema', function () {
       expect(newUser.active).to.be.a('boolean');
       expect(newUser.age).to.be.a('number');
     });
+  });
+  it('Should define default schema props', () => {
+    let newUser = testUserSchema.createDoc({
+      name: 'testuser',
+      email: 'user@domain.tld',
+      active: true,
+      age: 18,
+      invalidprop: 'whatever',
+    });
+    expect(newUser.profile).to.equal('no profile');
   });
   describe('#insert', () => {
     it('should return a promise', () => {
