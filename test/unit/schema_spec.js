@@ -6,10 +6,10 @@ const chai = require('chai');
 const fs = require('fs-extra');
 const expect = require('chai').expect;
 const testSchemaDBPath = path.join(__dirname, '../mock/schematestdb.json');
-let lowkie = require('../../index');
-let lowkieSchema = require('../../lib/schema');
+const lowkie = require('../../index');
+const lowkieSchema = require('../../lib/schema');
 const removeTestDB = require('../util/removeTestDB');
-let testUserSchemaScheme = {
+const testUserSchemaScheme = {
   name: String,
   email: String,
   active: Boolean,
@@ -19,6 +19,13 @@ let testUserSchemaScheme = {
     type: String,
     default: 'no profile',
   },
+  account: {
+    ref: 'account',
+    type: lowkieSchema.Types.ObjectId
+  }
+};
+const testAccountSchema = {
+  name: String
 };
 let testUserSchema;
 let testUserModel;
