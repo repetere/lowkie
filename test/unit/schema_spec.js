@@ -108,28 +108,34 @@ describe('Schema', function () {
     });
     expect(newUser.profile).to.equal('no profile');
   });
-  it('Should allow the definition of a populated field', () => {
-    let newAccount = testAccountSchema.createDoc({
+  it('Should allow the definition of a populated field', (done) => {
+    return testAccountModel.insert({
       name: 'Some Random Name'
-    });
-    expect(newAccount._id).to.be.ok;
-    let newUser = testUserSchema.createDoc({
-      name: 'testuser',
-      email: 'user@domain.tld',
-      active: true,
-      age: 18,
-      account: newAccount._id
-    });
-    let result = testUserModel
-      .chain()
-      .find({ _id: newUser._id })
-      .populate('account')
-      .data();
-    console.log('~~~~~~~~~~~~~');
-    console.log('~~~~~~~~~~~~~');
-    console.log(result);
-    console.log('~~~~~~~~~~~~~');
-    console.log('~~~~~~~~~~~~~');
+    })
+      .then(account => {
+        expect(account[0]._id).to.be.ok;
+        return testUserModel.insert({
+          name: 'testuser',
+          email: 'user@domain.tld',
+          active: true,
+          age: 18,
+          account: account[0]._id
+        });
+      })
+      .then(() => {
+        let result = testUserModel
+          .populate('account');
+          // .chain()
+          // .find({ _id: newUser._id })
+          //.data();
+        console.log('~~~~~~~~~~~~~');
+        console.log('~~~~~~~~~~~~~');
+        console.log(result);
+        console.log('~~~~~~~~~~~~~');
+        console.log('~~~~~~~~~~~~~');
+        done();
+      })
+      .catch(done);
   });
   describe('#insert', () => {
     it('should return a promise', () => {
