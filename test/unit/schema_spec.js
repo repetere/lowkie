@@ -20,15 +20,14 @@ const testUserSchemaScheme = {
     default: 'no profile',
   },
   account: {
-    ref: 'account',
+    ref: 'testaccount',
     type: lowkieSchema.Types.ObjectId
   }
 };
-const testAccountSchema = {
-  name: String
-};
 let testUserSchema;
 let testUserModel;
+let testAccountSchema;
+let testAccountModel;
 
 describe('Schema', function () {
   this.timeout(10000);
@@ -39,6 +38,8 @@ describe('Schema', function () {
         // console.log('connected schematestdb');
         testUserSchema = lowkie.Schema(testUserSchemaScheme);
         testUserModel = lowkie.model('testuser', testUserSchema);
+        testAccountSchema = lowkie.Schema({ name: String });
+        testAccountModel = lowkie.model('testaccount', testAccountSchema);
         // console.log({testUserSchema})
         done();
       })
@@ -106,6 +107,29 @@ describe('Schema', function () {
       invalidprop: 'whatever',
     });
     expect(newUser.profile).to.equal('no profile');
+  });
+  it('Should allow the definition of a populated field', () => {
+    let newAccount = testAccountSchema.createDoc({
+      name: 'Some Random Name'
+    });
+    expect(newAccount._id).to.be.ok;
+    let newUser = testUserSchema.createDoc({
+      name: 'testuser',
+      email: 'user@domain.tld',
+      active: true,
+      age: 18,
+      account: newAccount._id
+    });
+    let result = testUserModel
+      .chain()
+      .find({ _id: newUser._id })
+      .populate('account')
+      .data();
+    console.log('~~~~~~~~~~~~~');
+    console.log('~~~~~~~~~~~~~');
+    console.log(result);
+    console.log('~~~~~~~~~~~~~');
+    console.log('~~~~~~~~~~~~~');
   });
   describe('#insert', () => {
     it('should return a promise', () => {
