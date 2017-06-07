@@ -6,10 +6,10 @@ const chai = require('chai');
 const fs = require('fs-extra');
 const expect = require('chai').expect;
 const testSchemaDBPath = path.join(__dirname, '../mock/schematestdb.json');
-let lowkie = require('../../index');
-let lowkieSchema = require('../../lib/schema');
+const lowkie = require('../../index');
+const lowkieSchema = require('../../lib/schema');
 const removeTestDB = require('../util/removeTestDB');
-let testUserSchemaScheme = {
+const testUserSchemaScheme = {
   name: String,
   email: String,
   active: Boolean,
@@ -19,9 +19,15 @@ let testUserSchemaScheme = {
     type: String,
     default: 'no profile',
   },
+  account: {
+    ref: 'testaccount',
+    type: lowkieSchema.Types.ObjectId
+  }
 };
 let testUserSchema;
 let testUserModel;
+let testAccountSchema;
+let testAccountModel;
 
 describe('Schema', function () {
   this.timeout(10000);
@@ -32,6 +38,8 @@ describe('Schema', function () {
         // console.log('connected schematestdb');
         testUserSchema = lowkie.Schema(testUserSchemaScheme);
         testUserModel = lowkie.model('testuser', testUserSchema);
+        testAccountSchema = lowkie.Schema({ name: String });
+        testAccountModel = lowkie.model('testaccount', testAccountSchema);
         // console.log({testUserSchema})
         done();
       })
@@ -57,7 +65,7 @@ describe('Schema', function () {
   describe('#createDoc', () => {
     it('should always generate an Id', () => {
       expect(testUserSchema.createDoc({})._id).to.be.an('string');
-      expect(Object.keys(testUserSchema.createDoc({})).length).to.eql(1);
+      expect(Object.keys(testUserSchema.createDoc({})).length).to.eql(2);
     });
     it('should allow for custom Ids', () => {
       let customId = '1234';
@@ -89,6 +97,38 @@ describe('Schema', function () {
       expect(newUser.active).to.be.a('boolean');
       expect(newUser.age).to.be.a('number');
     });
+  });
+  it('Should define default schema props', () => {
+    let newUser = testUserSchema.createDoc({
+      name: 'testuser',
+      email: 'user@domain.tld',
+      active: true,
+      age: 18,
+      invalidprop: 'whatever',
+    });
+    expect(newUser.profile).to.equal('no profile');
+  });
+  it('Should allow the definition of a populated field', (done) => {
+    return testAccountModel.insert({
+      name: 'Some Random Name'
+    })
+      .then(account => {
+        expect(account[0]._id).to.be.ok;
+        return testUserModel.insert({
+          name: 'testuser',
+          email: 'user@domain.tld',
+          active: true,
+          age: 18,
+          account: account[0]._id
+        });
+      })
+      .then(newUser => {
+        let result = testUserModel.populate('account', { _id: newUser[0]._id })[0];
+        expect(result.account).to.have.property('name');
+        expect(result.account.name).to.equal('Some Random Name');
+        done();
+      })
+      .catch(done);
   });
   describe('#insert', () => {
     it('should return a promise', () => {
