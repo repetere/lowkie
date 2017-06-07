@@ -122,17 +122,10 @@ describe('Schema', function () {
           account: account[0]._id
         });
       })
-      .then(() => {
-        let result = testUserModel
-          .populate('account');
-          // .chain()
-          // .find({ _id: newUser._id })
-          //.data();
-        console.log('~~~~~~~~~~~~~');
-        console.log('~~~~~~~~~~~~~');
-        console.log(result);
-        console.log('~~~~~~~~~~~~~');
-        console.log('~~~~~~~~~~~~~');
+      .then(newUser => {
+        let result = testUserModel.populate('account', { _id: newUser[0]._id });
+        expect(result.account).to.have.property('name');
+        expect(result.account.name).to.equal('Some Random Name');
         done();
       })
       .catch(done);
