@@ -123,7 +123,7 @@ describe('Schema', function () {
         });
       })
       .then(newUser => {
-        let result = testUserModel.populate('account', { _id: newUser[0]._id });
+        let result = testUserModel.populate('account', { _id: newUser[0]._id })[0];
         expect(result.account).to.have.property('name');
         expect(result.account.name).to.equal('Some Random Name');
         done();
