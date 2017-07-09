@@ -9,6 +9,7 @@ const testSchemaDBPath = path.join(__dirname, '../mock/schematestdb.json');
 const lowkie = require('../../index');
 const lowkieSchema = require('../../lib/schema');
 const removeTestDB = require('../util/removeTestDB');
+const moment = require('moment');
 const testUserSchemaScheme = {
   name: String,
   email: String,
@@ -22,6 +23,10 @@ const testUserSchemaScheme = {
   account: {
     ref: 'testaccount',
     type: lowkieSchema.Types.ObjectId
+  },
+  createdat: {
+    type: Date,
+    default: Date.now
   }
 };
 let testUserSchema;
@@ -65,7 +70,7 @@ describe('Schema', function () {
   describe('#createDoc', () => {
     it('should always generate an Id', () => {
       expect(testUserSchema.createDoc({})._id).to.be.an('string');
-      expect(Object.keys(testUserSchema.createDoc({})).length).to.eql(2);
+      expect(Object.keys(testUserSchema.createDoc({})).length).to.eql(3);
     });
     it('should allow for custom Ids', () => {
       let customId = '1234';
@@ -82,7 +87,7 @@ describe('Schema', function () {
       });
       expect(newUser).to.be.an('object');
       expect(newUser.invalidprop).to.not.exist;
-      expect(Object.keys(newUser).length).to.eql(6);
+      expect(Object.keys(newUser).length).to.eql(7);
       expect(newUser._id).to.be.a('string');
     });
     it('should convert values to proper type', () => {
@@ -103,10 +108,19 @@ describe('Schema', function () {
       name: 'testuser',
       email: 'user@domain.tld',
       active: true,
-      age: 18,
-      invalidprop: 'whatever',
+      age: 18
     });
     expect(newUser.profile).to.equal('no profile');
+  });
+  it('Should respect function definitions as default schema props', () => {
+    let newUser = testUserSchema.createDoc({
+      name: 'anothertestuser',
+      email: 'anotheruser@domain.tld',
+      active: true,
+      age: 21
+    });
+    let date = moment();
+    expect(moment(newUser.createdat).isSame(date, 'day')).to.be.true;
   });
   it('Should allow the definition of a populated field', (done) => {
     return testAccountModel.insert({
