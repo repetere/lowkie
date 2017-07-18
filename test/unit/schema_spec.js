@@ -34,12 +34,12 @@ let testUserModel;
 let testAccountSchema;
 let testAccountModel;
 
-describe('Schema', function () {
+describe('Schema', function() {
   this.timeout(10000);
   before('intialize lowkie instances', (done) => {
     removeTestDB(testSchemaDBPath, false);
     lowkie.connect(testSchemaDBPath)
-      .then((/*db*/) => { 
+      .then(( /*db*/ ) => {
         // console.log('connected schematestdb');
         testUserSchema = lowkie.Schema(testUserSchemaScheme);
         testUserModel = lowkie.model('testuser', testUserSchema);
@@ -50,8 +50,8 @@ describe('Schema', function () {
       })
       .catch(done);
   });
-	describe('Lowkie Schema', function () {
-    it('should be an instance of a lowkieSchema', function () {
+  describe('Lowkie Schema', function() {
+    it('should be an instance of a lowkieSchema', function() {
       expect(testUserSchema).to.be.an.instanceof(lowkieSchema)
         .and.to.be.an('object');
       expect(testUserSchema).and.to.have.property('createDoc');
@@ -64,7 +64,7 @@ describe('Schema', function () {
   });
   describe('#LowkieSchema', () => {
     it('should include _id in valid schema properties', () => {
-      expect(Object.keys(testUserSchemaScheme).concat([ '_id', ])).to.eql(testUserSchema.validNames);
+      expect(Object.keys(testUserSchemaScheme).concat(['_id', ])).to.eql(testUserSchema.validNames);
     });
   });
   describe('#createDoc', () => {
@@ -74,7 +74,7 @@ describe('Schema', function () {
     });
     it('should allow for custom Ids', () => {
       let customId = '1234';
-      expect(testUserSchema.createDoc({ _id:customId, })._id).to.eql(customId);
+      expect(testUserSchema.createDoc({ _id: customId, })._id).to.eql(customId);
     });
     it('should ignore invalid schema props', () => {
       let newUser = testUserSchema.createDoc({
@@ -124,8 +124,8 @@ describe('Schema', function () {
   });
   it('Should allow the definition of a populated field', (done) => {
     return testAccountModel.insert({
-      name: 'Some Random Name'
-    })
+        name: 'Some Random Name'
+      })
       .then(account => {
         expect(account[0]._id).to.be.ok;
         return testUserModel.insert({
@@ -137,7 +137,9 @@ describe('Schema', function () {
         });
       })
       .then(newUser => {
-        let result = testUserModel.populate('account', { _id: newUser[0]._id })[0];
+        return testUserModel.populate('account', { _id: newUser[0]._id })[0];
+      })
+      .then(result => {
         expect(result.account).to.have.property('name');
         expect(result.account.name).to.equal('Some Random Name');
         done();
@@ -150,21 +152,21 @@ describe('Schema', function () {
     });
     it('should insert documents', (done) => {
       testUserSchema.insert({
-        target: testUserModel.insert,
-        thisArg: lowkie,
-        argumentsList: {
-          name: 'testuser',
-          email: 'user@domain.tld',
-          profile: 'mocha test',
-          location: {
-            lat: 30,
-            lng:-15,
+          target: testUserModel.insert,
+          thisArg: lowkie,
+          argumentsList: {
+            name: 'testuser',
+            email: 'user@domain.tld',
+            profile: 'mocha test',
+            location: {
+              lat: 30,
+              lng: -15,
+            },
+            active: false,
+            age: 18,
+            invalidprop: 'whatever',
           },
-          active: false,
-          age: 18,
-          invalidprop: 'whatever',
-        },
-      })
+        })
         .then(newdoc => {
           expect(newdoc).to.be.an('object');
           done();
@@ -173,25 +175,26 @@ describe('Schema', function () {
     });
     it('should insert multiple documents', (done) => {
       testUserSchema.insert({
-        target: testUserModel.insert,
-        thisArg: lowkie,
-        argumentsList: [{
-          name: 'testuser',
-          email: 'user@domain.tld',
-          profile: 'mocha test',
-          active: true,
-          age: 18,
-          invalidprop: 'whatever',
-        },
-        {
-          name: 'testuser2',
-          email: 'user2domain.tld',
-          profile: 'mocha test2',
-          active: false,
-          age: 19,
-          invalidprop: 'whatever',
-        }],
-      })
+          target: testUserModel.insert,
+          thisArg: lowkie,
+          argumentsList: [{
+              name: 'testuser',
+              email: 'user@domain.tld',
+              profile: 'mocha test',
+              active: true,
+              age: 18,
+              invalidprop: 'whatever',
+            },
+            {
+              name: 'testuser2',
+              email: 'user2domain.tld',
+              profile: 'mocha test2',
+              active: false,
+              age: 19,
+              invalidprop: 'whatever',
+            }
+          ],
+        })
         .then(newdocs => {
           // console.log({newdocs})
           expect(newdocs).to.be.an('array');
