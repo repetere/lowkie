@@ -24,6 +24,13 @@ const testUserSchemaScheme = {
     ref: 'testaccount',
     type: lowkieSchema.Types.ObjectId
   },
+  associated_accounts: [{
+    relationship: String,
+    user: {
+      ref: 'testaccount',
+      type: lowkieSchema.Types.ObjectId
+    }
+  }],
   createdat: {
     type: Date,
     default: Date.now
@@ -64,7 +71,7 @@ describe('Schema', function() {
   });
   describe('#LowkieSchema', () => {
     it('should include _id in valid schema properties', () => {
-      expect(Object.keys(testUserSchemaScheme).concat(['_id', ])).to.eql(testUserSchema.validNames);
+      expect(testUserSchema.validNames.indexOf('_id') !== -1).to.be.true;
     });
   });
   describe('#createDoc', () => {
@@ -124,8 +131,8 @@ describe('Schema', function() {
   });
   it('Should allow the definition of a populated field', (done) => {
     return testAccountModel.insert({
-        name: 'Some Random Name'
-      })
+      name: 'Some Random Name'
+    })
       .then(account => {
         expect(account[0]._id).to.be.ok;
         return testUserModel.insert({
@@ -136,12 +143,41 @@ describe('Schema', function() {
           account: account[0]._id
         });
       })
-      .then(newUser => {
-        return testUserModel.populate('account', { _id: newUser[0]._id })[0];
-      })
+      .then(newUser => testUserModel.populate('account', { _id: newUser[0]._id }))
       .then(result => {
+        result = result[0];
         expect(result.account).to.have.property('name');
         expect(result.account.name).to.equal('Some Random Name');
+        done();
+      })
+      .catch(done);
+  });
+  it('Should allow the definition of a nested populated field', (done) => {
+    return testAccountModel.insert({
+      name: 'A Good Friend'
+    })
+      .then(account => {
+        expect(account[0]).to.have.property('_id');
+        return testUserModel.insert({
+          name: 'anothertestuser',
+          email: 'friend@domain.tld',
+          active: true,
+          age: 18,
+          associated_accounts: [{
+            relationship: 'friend',
+            user: account[0]._id
+          }, {
+            relationship: 'friend',
+            user: account[0]._id
+          }]
+        });
+      })
+      .then(newUser => testUserModel.populate('associated_accounts.user', { _id: newUser[0]._id }))
+      .then(result => {
+        result = result[0];
+        expect(result.associated_accounts.length).to.equal(2);
+        expect(result.associated_accounts[0].user.name).to.equal('A Good Friend');
+        expect(result.associated_accounts[1].user.name).to.equal('A Good Friend');
         done();
       })
       .catch(done);
